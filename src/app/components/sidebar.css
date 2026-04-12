@@ -84,6 +84,12 @@
 .sidebar-item svg {
   flex-shrink: 0;
 }
+.sidebar-select {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+}
 
 /* ── Footer / Logout ── */
 .sidebar-footer {

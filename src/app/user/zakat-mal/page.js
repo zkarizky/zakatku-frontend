@@ -74,28 +74,28 @@ export default function ZakatMal() {
 
   // ── MIDTRANS PAY ─────────────────────
   const handlePay = async () => {
-    if (!window.snap) {
-      alert("Midtrans belum siap, refresh dulu")
-      return
-    }
-    try {
-      const res = await apiClient.post("/payment/create", {
-        amount: zakatAmount,
-        zakat_id: result.id,
-      })
-      window.snap.pay(res.data.token, {
-        onSuccess: () => {
-          alert("Pembayaran berhasil")
-          setShowPay(false)
-        },
-        onPending: () => alert("Menunggu pembayaran"),
-        onError: () => alert("Pembayaran gagal"),
-      })
-    } catch (err) {
-      console.log(err)
-      alert("Gagal membuat pembayaran")
-    }
+  try {
+    const res = await apiClient.post("/midtrans/transaction", {
+      amount: result.zakat_amount,
+      zakat_id: result.id
+    })
+
+    window.snap.pay(res.data.snap_token, {
+      onSuccess: function (result) {
+        alert("Pembayaran berhasil!")
+      },
+      onPending: function (result) {
+        alert("Menunggu pembayaran")
+      },
+      onError: function (result) {
+        alert("Pembayaran gagal")
+      }
+    })
+
+  } catch (err) {
+    console.log(err)
   }
+}
 
   return (
     <div style={{ display: "flex" }}>

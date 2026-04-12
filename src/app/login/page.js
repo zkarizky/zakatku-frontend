@@ -4,8 +4,10 @@ import { useState, useEffect } from "react"
 import apiClient from "../api/apiClient"
 import "./login.css"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -26,12 +28,22 @@ export default function LoginPage() {
     setError("")
     try {
       const res = await apiClient.post("/login", { email, password })
-      localStorage.setItem("token", res.data.token)
-      localStorage.setItem("user", JSON.stringify(res.data.user))
-      const user = res.data.user
-      window.location.href = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"
+
+      const { token, user } = res.data
+
+      localStorage.setItem("token", token)
+      localStorage.setItem("user", JSON.stringify(user))
+
+      // 🔥 redirect berdasarkan role
+      if (user.role === "admin") {
+        router.push("/admin/dashboard")
+      } else {
+        router.push("/user/dashboard")
+      }
+
     } catch (err) {
-      setError("Email atau password salah. Silakan coba lagi.")
+      console.log(err)
+      setError("Email atau password salah")
     } finally {
       setLoading(false)
     }
