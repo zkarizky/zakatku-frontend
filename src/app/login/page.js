@@ -1,3 +1,14 @@
+/**
+ * LoginPage — halaman login aplikasi ZakatKu.
+ * Menampilkan form email + password dengan panel kiri berisi informasi fitur.
+ * 
+ * Fitur:
+ * - Auto-redirect jika sudah login (berdasarkan token di localStorage)
+ * - Toggle show/hide password
+ * - Loading state saat proses login
+ * - Error handling jika email/password salah
+ * - Redirect berdasarkan role (admin → /admin/dashboard, user → /user/dashboard)
+ */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -8,29 +19,45 @@ import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const router = useRouter()
+  // State untuk menyimpan input form
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  // State toggle visibilitas password (show/hide)
   const [showPassword, setShowPassword] = useState(false)
+  // State loading ketika tombol login ditekan
   const [loading, setLoading] = useState(false)
+  // State pesan error jika login gagal
   const [error, setError] = useState("")
 
+  /**
+   * Auto-redirect: Jika user sudah login (ada token),
+   * langsung arahkan ke dashboard sesuai role.
+   */
   useEffect(() => {
     const token = localStorage.getItem("token")
     const user = JSON.parse(localStorage.getItem("user"))
     if (token && user) {
+      // Redirect berdasarkan role user
       window.location.href = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"
     }
   }, [])
 
+  /**
+   * Handler submit form login.
+   * Mengirim email & password ke API, menyimpan token & user di localStorage,
+   * lalu redirect ke dashboard sesuai role.
+   */
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError("")
     try {
+      // Kirim credentials ke endpoint /login
       const res = await apiClient.post("/login", { email, password })
 
       const { token, user } = res.data
 
+      // Simpan token dan data user ke localStorage untuk sesi berikutnya
       localStorage.setItem("token", token)
       localStorage.setItem("user", JSON.stringify(user))
 
@@ -43,6 +70,7 @@ export default function LoginPage() {
 
     } catch (err) {
       console.log(err)
+      // Tampilkan pesan error di UI
       setError("Email atau password salah")
     } finally {
       setLoading(false)
@@ -51,12 +79,14 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      {/* Left Panel */}
+      {/* Left Panel — informasi fitur & branding aplikasi */}
       <div className="login-left">
         <div className="login-left-content">
+          {/* Logo Brand */}
           <div className="login-brand">
             <div className="login-logo">Zakat<span>Ku</span></div>
           </div>
+          {/* Judul dan deskripsi aplikasi */}
           <h2 className="login-left-title">
             Kelola Zakat<br />dengan Mudah & Tepat
           </h2>
@@ -66,6 +96,7 @@ export default function LoginPage() {
             kewajiban zakat Anda dengan lebih teratur.
           </p>
 
+          {/* Daftar fitur unggulan aplikasi */}
           <div className="login-features">
             <div className="login-feature-item">
               <div className="login-feature-icon">🧮</div>
@@ -91,14 +122,15 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Decorative blobs */}
+        {/* Decorative blobs — elemen dekorasi visual */}
         <div className="login-blob blob-1" />
         <div className="login-blob blob-2" />
       </div>
 
-      {/* Right Panel - Form */}
+      {/* Right Panel - Form login */}
       <div className="login-right">
         <div className="login-form-wrap">
+          {/* Header form */}
           <div className="login-form-header">
             <div className="login-form-logo">Zakat<span>Ku</span></div>
             <h1 className="login-form-title">Selamat Datang</h1>
@@ -106,6 +138,7 @@ export default function LoginPage() {
           </div>
 
           <form className="login-form" onSubmit={handleLogin}>
+            {/* Pesan error — ditampilkan jika login gagal */}
             {error && (
               <div className="login-error">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -113,7 +146,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Email */}
+            {/* Input Email */}
             <div className="login-field">
               <label className="login-label">Email</label>
               <div className="login-input-wrap">
@@ -130,7 +163,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Input Password dengan toggle show/hide */}
             <div className="login-field">
               <label className="login-label">Password</label>
               <div className="login-input-wrap">
@@ -144,6 +177,7 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                 />
+                {/* Tombol toggle show/hide password */}
                 <button
                   type="button"
                   className="login-eye-btn"
@@ -159,6 +193,7 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Tombol submit login — disabled saat loading atau input kosong */}
             <button
               className={`login-btn ${loading ? "loading" : ""}`}
               type="submit"
@@ -172,6 +207,7 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* Link ke halaman registrasi */}
           <p className="reg-footer-note">
             Belum punya akun?{" "}
             <Link href="/register" className="reg-login-link">Daftar di sini</Link>

@@ -75,9 +75,9 @@ export default function ZakatProfesi() {
   // --- Handler Pembayaran (Integrasi Payment Gateway) ---
   const handlePay = async () => {
   try {
-    const res = await apiClient.post("/midtrans/transaction", {
+    const res = await apiClient.post("/payment/create", {
       amount: result.zakat_amount,
-      zakat_id: zakat.id
+      zakat_id: result.id
     })
 
     window.snap.pay(res.data.snap_token, {
