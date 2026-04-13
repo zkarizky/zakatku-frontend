@@ -20,7 +20,8 @@ export default function ZakatProfesi() {
   const [error, setError] = useState(null)              // Menyimpan pesan error jika ada kegagalan HTTP
   const [showPay, setShowPay] = useState(false)         // Flag untuk menampilkan modal konfirmasi pembayaran
   const [paying, setPaying] = useState(false)           // Status loading saat tombol 'Bayar' di modal ditekan
-
+  const [zakatAmount, setZakatAmount] = useState(0)
+  const [zakat, setZakat] = useState(null)
   // --- Mengambil Data Profil ---
   // Hook useEffect ini akan dijalankan satu kali saat komponen pertama kali dimuat
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function ZakatProfesi() {
   try {
     const res = await apiClient.post("/midtrans/transaction", {
       amount: result.zakat_amount,
-      zakat_id: result.id
+      zakat_id: zakat.id
     })
 
     window.snap.pay(res.data.snap_token, {

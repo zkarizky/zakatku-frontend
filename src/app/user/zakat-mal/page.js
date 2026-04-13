@@ -18,6 +18,7 @@ export default function ZakatMal() {
 
   const [showPay, setShowPay] = useState(false)
   const [zakatAmount, setZakatAmount] = useState(0)
+  const [zakatId, setZakatId] = useState(null)
 
   // ── FETCH PROFILE ─────────────────────
   useEffect(() => {
@@ -76,8 +77,8 @@ export default function ZakatMal() {
   const handlePay = async () => {
   try {
     const res = await apiClient.post("/midtrans/transaction", {
-      amount: result.zakat_amount,
-      zakat_id: result.id
+      zakatAmount: result.zakat_amount,
+      zakatId: result.id
     })
 
     window.snap.pay(res.data.snap_token, {
